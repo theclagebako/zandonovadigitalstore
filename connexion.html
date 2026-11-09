@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101d35"><meta name="robots" content="noindex,nofollow"><title>Connexion — Zandonova Digital Store</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./styles.css"></head>
+<body class="auth-body"><header class="site-header"><div class="container nav-wrap"><a class="brand" href="./"><span class="brand-mark">Z</span><span><b>ZANDONOVA</b><small>DIGITAL STORE</small></span></a><a class="text-link" style="color:#17243a" href="./">← Retour à la boutique</a></div></header>
+<main class="auth-wrap">
+<aside class="auth-aside"><span class="auth-eyebrow">Espace client</span><h2>Le savoir qui <em>avance avec vous.</em></h2>
+<ul class="auth-points"><li><span class="tick">✓</span><span>Retrouvez toutes vos commandes au même endroit.</span></li><li><span class="tick">✓</span><span>Téléchargez vos ebooks en PDF dès que votre paiement est vérifié.</span></li><li><span class="tick">✓</span><span>Payez par Mobile Money : M-Pesa, Orange Money, Airtel Money.</span></li></ul>
+<p class="auth-help">Une question ? Écrivez-nous sur <a id="helpWa" href="#" target="_blank" rel="noopener">WhatsApp</a>.</p></aside>
+<section class="auth-main"><div class="auth-card">
+<div class="auth-head"><h1 id="authTitle">Bon retour</h1><p id="authSub">Connectez-vous pour retrouver vos commandes et vos ebooks.</p></div>
+<div class="seg" id="authTabs" role="tablist"><button type="button" class="active" data-mode="login" role="tab">Connexion</button><button type="button" data-mode="signup" role="tab">Créer un compte</button></div>
+<div id="authMessage" class="auth-alert" role="alert" hidden></div>
+
+<form id="form-login" class="auth-form" novalidate>
+<div class="field"><label for="l-email">Adresse e-mail</label><input id="l-email" name="email" type="email" required autocomplete="username" inputmode="email" placeholder="vous@exemple.com"></div>
+<div class="field"><div class="auth-row"><label for="l-pass">Mot de passe</label><button class="auth-link" type="button" data-mode="forgot">Mot de passe oublié ?</button></div><div class="pw"><input id="l-pass" name="password" type="password" required autocomplete="current-password" placeholder="Votre mot de passe"><button class="pw-toggle" type="button" aria-pressed="false">Afficher</button></div></div>
+<button class="auth-submit" type="submit">Se connecter</button>
+<p class="auth-alt">Pas encore de compte ? <button class="auth-link" type="button" data-mode="signup">Créer un compte</button></p></form>
+
+<form id="form-signup" class="auth-form" hidden novalidate>
+<div class="field"><label for="s-name">Nom complet</label><input id="s-name" name="name" required minlength="2" maxlength="120" autocomplete="name" placeholder="Votre nom et prénom"></div>
+<div class="field"><label for="s-email">Adresse e-mail</label><input id="s-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="vous@exemple.com"></div>
+<div class="field"><label for="s-pass">Mot de passe</label><div class="pw"><input id="s-pass" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="8 caractères minimum"><button class="pw-toggle" type="button" aria-pressed="false">Afficher</button></div><div class="meter" id="pwMeter" data-score="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span class="hint" id="pwHint">Utilisez au moins 8 caractères. Mélangez lettres, chiffres et symboles pour plus de sécurité.</span></div>
+<div class="field"><label for="s-conf">Confirmer le mot de passe</label><div class="pw"><input id="s-conf" name="confirm" type="password" required minlength="8" autocomplete="new-password" placeholder="Retapez le mot de passe"><button class="pw-toggle" type="button" aria-pressed="false">Afficher</button></div></div>
+<div class="hp" aria-hidden="true"><label>Ne pas remplir<input name="website" tabindex="-1" autocomplete="off"></label></div>
+<button class="auth-submit" type="submit">Créer mon compte</button>
+<p class="auth-alt">Déjà inscrit ? <button class="auth-link" type="button" data-mode="login">Se connecter</button></p></form>
+
+<form id="form-forgot" class="auth-form" hidden novalidate>
+<div class="field"><label for="f-email">Adresse e-mail de votre compte</label><input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="vous@exemple.com"></div>
+<button class="auth-submit" type="submit">Recevoir le lien</button>
+<p class="auth-alt"><button class="auth-link" type="button" data-mode="login">← Retour à la connexion</button></p></form>
+
+<form id="form-reset" class="auth-form" hidden novalidate>
+<div class="field"><label for="r-pass">Nouveau mot de passe</label><div class="pw"><input id="r-pass" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="8 caractères minimum"><button class="pw-toggle" type="button" aria-pressed="false">Afficher</button></div></div>
+<div class="field"><label for="r-conf">Confirmer le mot de passe</label><div class="pw"><input id="r-conf" name="confirm" type="password" required minlength="8" autocomplete="new-password" placeholder="Retapez le mot de passe"><button class="pw-toggle" type="button" aria-pressed="false">Afficher</button></div></div>
+<button class="auth-submit" type="submit">Enregistrer le mot de passe</button></form>
+
+<div id="authDone" class="auth-done" hidden><div class="ico" id="doneIcon">✉</div><h2 id="doneTitle"></h2><p id="doneText"></p><p><button class="auth-link" id="resendBtn" type="button">Renvoyer l’e-mail</button></p><p class="auth-alt"><button class="auth-link" type="button" data-mode="login">← Retour à la connexion</button></p></div>
+<p class="auth-secure"><span aria-hidden="true">🔒</span><span>Connexion sécurisée · Vos données restent confidentielles.</span></p>
+</div></section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>')}</script>
+<script src="./config.js"></script><script src="./connexion.js"></script></body></html>

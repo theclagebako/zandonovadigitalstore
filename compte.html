@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101d35"><meta name="robots" content="noindex,nofollow"><title>Mon compte — Zandonova Digital Store</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./styles.css"></head>
+<body class="auth-body"><header class="site-header"><div class="container nav-wrap"><a class="brand" href="./"><span class="brand-mark">Z</span><span><b>ZANDONOVA</b><small>DIGITAL STORE</small></span></a><a class="text-link" style="color:#17243a" href="./">← Retour à la boutique</a></div></header>
+<main class="acct-wrap">
+<section class="acct-hero"><div class="avatar" id="avatar" aria-hidden="true">Z</div><div class="grow" id="acctHello"><h1>Mon compte</h1><p>Chargement…</p></div><button class="ghost-btn" id="logoutBtn" type="button" hidden>Se déconnecter</button></section>
+<div id="acctStatus" class="auth-alert" role="status" hidden></div>
+<section class="acct-section"><h2>Mes commandes</h2><div id="ordersBox" class="orders-list"></div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>')}</script>
+<script src="./config.js"></script><script src="./compte.js"></script></body></html>
