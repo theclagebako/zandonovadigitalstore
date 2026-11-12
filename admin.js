@@ -177,6 +177,6 @@ async function initUserAdmin(){
   const {data:{session}}=await db.auth.getSession();currentUserId=session?.user?.id||null;
 }
 
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('#productsPanel').hidden=b.dataset.tab!=='products';$('#ordersPanel').hidden=b.dataset.tab!=='orders';if(b.dataset.tab==='orders')loadOrders()}));$('#refreshOrders').onclick=loadOrders;
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('#productsPanel').hidden=b.dataset.tab!=='products';$('#ordersPanel').hidden=b.dataset.tab!=='orders';$('#usersPanel').hidden=b.dataset.tab!=='users';if(b.dataset.tab==='orders')loadOrders();if(b.dataset.tab==='users')initUserAdmin().then(loadUsers)}));$('#refreshOrders').onclick=loadOrders;
 checkSession();
 })();
