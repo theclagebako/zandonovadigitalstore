@@ -128,9 +128,10 @@ async function loadUsers(){
  const msg=$('#usersMessage');msg.textContent='Chargement des utilisateurs…';
  $('#usersList').innerHTML='<div class="empty-admin">Chargement…</div>';
  try{
-  const data=await userAdminCall({action:'list_users',page:1});
-  managedUsers=data.users||[];renderUsers();
-  msg.textContent=data.has_more?'Les 100 premiers comptes sont affichés.':'Liste actualisée.';
+  managedUsers=[];let page=1,hasMore=true;
+  while(hasMore&&page<=50){const data=await userAdminCall({action:'list_users',page});managedUsers.push(...(data.users||[]));hasMore=!!data.has_more;page++;}
+  renderUsers();
+  msg.textContent='Liste actualisée : '+managedUsers.length+' compte(s).'+(hasMore?' Affichage limité aux 5 000 premiers comptes.':'');
  }catch(e){msg.textContent=e.message;$('#usersList').innerHTML='<div class="empty-admin">Impossible de charger les utilisateurs.</div>'}
 }
 async function showUserDetails(id){
