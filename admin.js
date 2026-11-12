@@ -98,6 +98,85 @@ $('#ordersList').addEventListener('click',async e=>{
     }
   }catch(err){console.error(err);toast(err.message||'Action impossible.');b.disabled=false}
 });
+
+let usersCache=[], currentUserId=null;
+const userDate=d=>d?new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}):'Jamais';
+const userSuspended=u=>!!u.banned_until&&new Date(u.banned_until).getTime()>Date.now();
+const userInvoke=async body=>{const {data,error}=await db.functions.invoke('zando-user-admin',{body});if(error)throw error;if(!data?.ok)throw new Error(data?.error||'Opération impossible.');return data};
+async function loadUsers(){
+  const box=$('#usersList');box.innerHTML='<div class="empty-admin">Chargement des utilisateurs…</div>';
+  $('#userDetails').hidden=true;
+  try{
+    const all=[];let page=1,hasMore=true;
+    while(hasMore&&page<=50){const r=await userInvoke({action:'list_users',page});all.push(...(r.users||[]));hasMore=!!r.has_more;page++}
+    usersCache=all;renderUsers();
+  }catch(e){box.innerHTML='<div class="empty-admin">Impossible de charger les utilisateurs : '+esc(e.message)+'</div>';$('#usersSummary').textContent='Erreur de chargement.'}
+}
+function renderUsers(){
+  const q=$('#userSearch').value.trim().toLowerCase(),filter=$('#userFilter').value;
+  const rows=usersCache.filter(u=>{
+    const suspended=userSuspended(u);
+    if(filter==='active'&&suspended)return false;
+    if(filter==='suspended'&&!suspended)return false;
+    if(filter==='admins'&&!u.is_admin)return false;
+    return !q||[u.email,u.name,u.id].some(v=>String(v||'').toLowerCase().includes(q));
+  });
+  $('#usersSummary').textContent=rows.length+' compte(s) affiché(s) sur '+usersCache.length+' · '+usersCache.filter(u=>u.is_admin).length+' administrateur(s)';
+  $('#usersList').innerHTML=rows.length?rows.map(u=>{
+    const suspended=userSuspended(u),self=u.id===currentUserId;
+    return '<div class="admin-row user-row"><div class="user-avatar">'+esc((u.name||u.email||'?').trim().charAt(0).toUpperCase())+'</div><div class="user-main"><b>'+esc(u.name||'Sans nom')+'</b><small>'+esc(u.email||'E-mail indisponible')+'</small><small>Inscrit le '+userDate(u.created_at)+' · Dernière connexion : '+userDate(u.last_sign_in_at)+'</small></div><div class="user-actions"><span class="status-pill '+(u.is_admin?'paid':suspended?'pending':'')+'">'+(u.is_admin?'Administrateur':suspended?'Suspendu':'Actif')+'</span><button class="mini-btn" data-user-action="details" data-id="'+u.id+'">Détails</button><button class="mini-btn" data-user-action="status" data-id="'+u.id+'" '+(self||u.is_admin?'disabled':'')+'>'+(suspended?'Réactiver':'Suspendre')+'</button><button class="mini-btn" data-user-action="admin" data-id="'+u.id+'" '+(self?'disabled':'')+'>'+(u.is_admin?'Retirer admin':'Promouvoir admin')+'</button><button class="mini-btn danger" data-user-action="delete" data-id="'+u.id+'" '+(self||u.is_admin?'disabled':'')+'>Supprimer</button></div></div>';
+  }).join(''):'<div class="empty-admin">Aucun utilisateur ne correspond à votre recherche.</div>';
+}
+async function showUserDetails(id){
+  const panel=$('#userDetails');panel.hidden=false;panel.innerHTML='<div class="empty-admin">Chargement du profil et de l’historique…</div>';
+  try{
+    const r=await userInvoke({action:'user_details',user_id:id}),u=r.user,orders=r.orders||[];
+    const suspended=userSuspended(u);
+    panel.innerHTML='<div class="user-detail-head"><div><h3>'+esc(u.name||'Profil utilisateur')+'</h3><p>'+esc(u.email)+' · Inscrit le '+userDate(u.created_at)+'</p><p>Dernière connexion : '+userDate(u.last_sign_in_at)+' · E-mail '+(u.email_confirmed_at?'confirmé':'non confirmé')+'</p></div><button class="mini-btn" id="closeUserDetails">Fermer</button></div><h4>Historique des commandes ('+orders.length+')</h4>'+(orders.length?orders.map(o=>'<div class="user-order"><div><b>'+esc(o.id.slice(0,8).toUpperCase())+' · '+esc(o.status)+'</b><small>'+userDate(o.created_at)+' · '+(o.currency==='USD'?'(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('#productsPanel').hidden=b.dataset.tab!=='products';$('#ordersPanel').hidden=b.dataset.tab!=='orders';if(b.dataset.tab==='orders')loadOrders();if(b.dataset.tab==='users'){initUserAdmin().then(loadUsers)}}));$('#refreshOrders').onclick=loadOrders;
+checkSession();
+})();+Number(o.total_usd||0).toFixed(2):new Intl.NumberFormat('fr-FR').format(Number(o.total_cdf||0))+' FC')+'</small><small>'+(o.items||[]).map(i=>esc(i.product_title)+' ×'+Number(i.quantity||0)).join(', ')+'</small></div></div>').join(''):'<p class="form-note">Aucune commande liée à ce compte.</p>');
+    $('#closeUserDetails').onclick=()=>{panel.hidden=true};
+    panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){panel.innerHTML='<div class="empty-admin">Détails indisponibles : '+esc(e.message)+'</div>'}
+}
+async function handleUserAction(action,id){
+  const u=usersCache.find(x=>x.id===id);if(!u)return;
+  try{
+    if(action==='details'){await showUserDetails(id);return}
+    if(action==='status'){
+      const suspended=userSuspended(u),verb=suspended?'réactiver':'suspendre';
+      if(!confirm('Confirmer : '+verb+' le compte '+u.email+' ?'))return;
+      await userInvoke({action:'set_status',user_id:id,status:suspended?'active':'suspended'});
+      toast(suspended?'Compte réactivé.':'Compte suspendu.');
+    }else if(action==='admin'){
+      const enabled=!u.is_admin,verb=enabled?'promouvoir':'retirer les droits administrateur de';
+      if(!confirm('Confirmer : '+verb+' '+u.email+' ?'))return;
+      await userInvoke({action:'set_admin',user_id:id,enabled});
+      toast(enabled?'Droits administrateur accordés.':'Droits administrateur retirés.');
+    }else if(action==='delete'){
+      if(!confirm('ATTENTION : supprimer définitivement le compte '+u.email+' ? L’historique des commandes sera conservé dans la boutique, mais dissocié de ce compte.'))return;
+      const email=prompt('Pour confirmer, saisissez exactement l’adresse e-mail : '+u.email);
+      if(email===null)return;
+      if(email.trim().toLowerCase()!==u.email.toLowerCase())throw new Error('L’adresse e-mail ne correspond pas. Suppression annulée.');
+      await userInvoke({action:'delete_user',user_id:id,confirm_email:email.trim()});
+      toast('Compte supprimé. Historique des commandes conservé.');
+    }
+    await loadUsers();
+  }catch(e){toast(e.message||'Action impossible.')}
+}
+$('#usersList').addEventListener('click',e=>{const b=e.target.closest('[data-user-action]');if(b&&!b.disabled)handleUserAction(b.dataset.userAction,b.dataset.id)});
+$('#userSearch').addEventListener('input',renderUsers);
+$('#userFilter').addEventListener('change',renderUsers);
+$('#refreshUsers').onclick=loadUsers;
+$('#exportUsers').onclick=()=>{
+  const rows=[['Nom','E-mail','ID','Inscription','Dernière connexion','Statut','Administrateur'],...usersCache.map(u=>[u.name,u.email,u.id,u.created_at,u.last_sign_in_at,userSuspended(u)?'Suspendu':'Actif',u.is_admin?'Oui':'Non'])];
+  const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download='zandonova-utilisateurs-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+};
+async function initUserAdmin(){
+  const {data:{session}}=await db.auth.getSession();currentUserId=session?.user?.id||null;
+}
+
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('#productsPanel').hidden=b.dataset.tab!=='products';$('#ordersPanel').hidden=b.dataset.tab!=='orders';if(b.dataset.tab==='orders')loadOrders()}));$('#refreshOrders').onclick=loadOrders;
 checkSession();
 })();
