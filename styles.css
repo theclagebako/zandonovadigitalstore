@@ -148,3 +148,13 @@
 .product-detail-note{font-size:11px;line-height:1.6;color:var(--muted);margin:0}
 .product-detail-error{text-align:center;padding:50px 20px;background:#fff;border:1px solid var(--line);border-radius:14px}
 @media(max-width:700px){.product-detail-wrap{padding:22px 14px 55px}.product-detail{grid-template-columns:1fr;gap:22px;padding:16px}.product-detail-cover{min-height:260px;max-height:380px}.product-detail-cover img{max-height:380px}.product-detail-cover .cover-placeholder{min-height:260px}.product-detail-copy{padding:0}.product-detail-copy .detail-short{font-size:14px}}
+
+/* --- Vidéo de présentation de la boutique --- */
+.presentation-section{background:var(--cream);padding:66px 0 72px;border-bottom:1px solid var(--line)}
+.presentation-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:48px;align-items:center;justify-content:space-between}
+.presentation-copy h2{font:800 clamp(29px,3.5vw,42px)/1.15 Manrope;letter-spacing:-1.8px;color:var(--navy);margin:12px 0}
+.presentation-copy h2 em{font-style:normal;color:#259d96}
+.presentation-copy p{max-width:440px;color:#788497;font-size:13px;line-height:1.8;margin:0}
+.presentation-video-wrap{width:100%;max-width:360px;justify-self:center;background:var(--navy);padding:8px;border-radius:18px;box-shadow:0 18px 45px rgba(16,29,53,.18)}
+.presentation-video{display:block;width:100%;max-height:620px;aspect-ratio:9/16;object-fit:contain;background:#080f1c;border-radius:11px}
+@media(max-width:700px){.presentation-section{padding:48px 0}.presentation-inner{grid-template-columns:1fr;gap:25px}.presentation-copy h2{font-size:30px}.presentation-video-wrap{max-width:min(100%,330px)}}
